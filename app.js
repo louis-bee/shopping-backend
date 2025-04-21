@@ -24,14 +24,14 @@ app.use((req,res,next)=>{
   next()
 })
 
-//导入并使用用户路由模块
+//用户路由模块
 const userRouter =  require('./router/user')
 app.use('/api', userRouter)
 
-// 测试路由
-// app.get('/', (req, res) => {
-//   res.send('Hello World!');
-// });
+//商品路由模块
+const goodsRouter =  require('./router/goods')
+app.use('/goods', goodsRouter)
+
 
 //使用全局错误处理中间件
 app.use((err, req, res, next) => {
