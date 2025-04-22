@@ -13,6 +13,10 @@ app.use(bodyParser.json());
 //解析表单数据的中间件
 app.use(express.urlencoded({extended:false}))
 
+// 配置静态文件目录
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 //在路由前封装res.cc
 app.use((req,res,next)=>{
   res.cc = function(err, status=500) {
@@ -31,6 +35,10 @@ app.use('/api', userRouter)
 //商品路由模块
 const goodsRouter =  require('./router/goods')
 app.use('/goods', goodsRouter)
+
+//图片上传路由模块
+const uploadRouter =  require('./router/upload')
+app.use('/upload', uploadRouter)
 
 
 //使用全局错误处理中间件

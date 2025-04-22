@@ -33,7 +33,7 @@ exports.login = (req, res)=>{
     const tokenStr = jwt.sign(user, config.jwtSecretKey, {expiresIn:config.expiresIn})
     res.send({
       status: 200,
-      message: '登录成功',
+      desc: '登录成功',
       data: {
         id: result[0].id,
         account: result[0].account,
@@ -67,4 +67,22 @@ exports.register = (req, res)=>{
       res.cc('注册成功', 200)
     })
   })
+}
+
+//注销
+exports.logout = (req, res)=>{
+  const userId = req.body.id
+  if(userId) {
+    return res.cc('字段不能为空')
+  }
+  //登录日志
+  // const sqlout = `select * from user where account=?`
+  // db.query(sqlsearch, userId, (err, result)=>{
+  //   if(err) return res.cc(err)
+  //   if(result.length!==1) return res.cc('没有该账号')
+    res.send({
+      status: 200,
+      desc: '登出成功',
+    })
+  // })
 }

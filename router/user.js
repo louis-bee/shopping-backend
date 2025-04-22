@@ -6,4 +6,6 @@ router.post('/login', userHandler.login)
 
 router.post('/register', userHandler.register)
 
+router.post('/logout', userHandler.logout)
+
 module.exports = router

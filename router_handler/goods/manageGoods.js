@@ -3,9 +3,10 @@ const db = require('../../db/index')
 //创建商品
 exports.addGoods = (req,res)=>{
   const goodsInfo = req.body
-  if(!goodsInfo.sellerId||!goodsInfo.goodsName||!goodsInfo.type||!goodsInfo.desc||!goodsInfo.price||!goodsInfo.status||!goodsInfo.amount||!goodsInfo.view||!goodsInfo.sales||!goodsInfo.images) {
+  if(!goodsInfo.sellerId||!goodsInfo.goodsName||!goodsInfo.type||!goodsInfo.desc||!goodsInfo.price||!goodsInfo.status||!goodsInfo.amount||goodsInfo.view!==0||goodsInfo.sales!==0||!goodsInfo.images) {
     return res.cc('字段不能为空')
   }
+  const imagesList = goodsInfo.images.join('*')
   const sqlsearch = 'select * from goods where goodsName=?'
   db.query(sqlsearch, goodsInfo.goodsName, (err,result)=>{
     if(err) {
@@ -15,7 +16,7 @@ exports.addGoods = (req,res)=>{
       return res.cc('商品重名, 请重新输入商品名')
     }
     const sqlinsert = 'insert into goods set ?'
-    db.query(sqlinsert, goodsInfo, (err,result)=>{
+    db.query(sqlinsert, {...goodsInfo, images:imagesList}, (err,result)=>{
       if(err) return res.cc(err)
       if(result.affectedRows!==1) return res.cc('发布失败')
       res.cc('发布成功',200 )
@@ -26,7 +27,7 @@ exports.addGoods = (req,res)=>{
 //修改商品
 exports.updateGoods = (req,res)=>{
   const goodsInfo = req.body
-  if(!goodsInfo.id||!goodsInfo.sellerId||!goodsInfo.goodsName||!goodsInfo.type||!goodsInfo.desc||!goodsInfo.price||!goodsInfo.status||!goodsInfo.amount||!goodsInfo.view||!goodsInfo.sales||!goodsInfo.images) {
+  if(!goodsInfo.sellerId||!goodsInfo.goodsName||!goodsInfo.type||!goodsInfo.desc||!goodsInfo.price||!goodsInfo.status||goodsInfo.amount===undefined||goodsInfo.view===undefined||goodsInfo.sales===undefined||!goodsInfo.images) {
     return res.cc('字段不能为空')
   }
   const sqlsearch = 'select * from goods where id=?'
@@ -36,37 +37,17 @@ exports.updateGoods = (req,res)=>{
     }
     if(result.length>0) { 
       //更新商品数据库
-      const sql = 'UPDATE goods SET sellerId=?, goodsName=?, type=?, desc=?, price=?, status=?, amount=?, view=?, images=? WHERE id=?'
-      db.query(sql, [goodsInfo.sellerId, goodsInfo.goodsName, goodsInfo.type, goodsInfo.desc, goodsInfo.price, goodsInfo.status, goodsInfo.amount, goodsInfo.view, goodsInfo.sales, goodsInfo.images, goodsInfo.id],(err,result)=>{
+      const imagesList = goodsInfo.images.join('*')
+      const sql = 'UPDATE goods SET sellerId=?, goodsName=?, type=?, \`desc\`=?, price=?, status=?, amount=?, view=?, sales=?, images=? WHERE id=?'
+      db.query(sql, [goodsInfo.sellerId, goodsInfo.goodsName, goodsInfo.type, goodsInfo.desc, goodsInfo.price, goodsInfo.status, goodsInfo.amount, goodsInfo.view, goodsInfo.sales, imagesList, goodsInfo.id],(err,result)=>{
         if(err) return res.cc(err)
         if(result.affectedRows!==1) return res.cc('修改失败')
-      })
-    } else {
-      res.cc('查询不到该商品，修改失败')
-    }
-  })
-}
-
-//修改商品
-exports.updateGoods = (req,res)=>{
-  const goodsInfo = req.body
-  if(!goodsInfo.id||!goodsInfo.sellerId||!goodsInfo.goodsName||!goodsInfo.type||!goodsInfo.desc||!goodsInfo.price||!goodsInfo.status||!goodsInfo.amount||!goodsInfo.view||!goodsInfo.sales||!goodsInfo.images) {
-    return res.cc('字段不能为空')
-  }
-  const sqlsearch = 'select * from goods where id=?'
-  db.query(sqlsearch, goodsInfo.id, (err, result)=>{
-    if(err) {
-      return res.cc(err)
-    }
-    if(result.length>0) {
-      if(result[0].sellerId!==goodsInfo.sellerId) {
-        return res.cc('你没有修改的权限')
-      } 
-      //更新商品数据库
-      const sql = 'UPDATE goods SET sellerId=?, goodsName=?, type=?, desc=?, price=?, status=?, amount=?, view=?, images=? WHERE id=?'
-      db.query(sql, [goodsInfo.sellerId, goodsInfo.goodsName, goodsInfo.type, goodsInfo.desc, goodsInfo.price, goodsInfo.status, goodsInfo.amount, goodsInfo.view, goodsInfo.sales, goodsInfo.images, goodsInfo.id],(err,result)=>{
-        if(err) return res.cc(err)
-        if(result.affectedRows!==1) return res.cc('修改失败')
+        else {
+          res.send({
+            status:200,
+            desc:'商品修改成功'
+          })
+        }
       })
     } else {
       res.cc('查询不到该商品，修改失败')
