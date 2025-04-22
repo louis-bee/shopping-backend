@@ -8,4 +8,6 @@ router.post('/register', userHandler.register)
 
 router.post('/logout', userHandler.logout)
 
+router.post('/refreshToken', userHandler.refreshToken)
+
 module.exports = router

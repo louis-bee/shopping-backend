@@ -28,6 +28,13 @@ app.use((req,res,next)=>{
   next()
 })
 
+//在路由前配置解析token的中间件
+const expressJWT = require('express-jwt')
+const config = require('./config')
+app.use(expressJWT({ secret: config.jwtSecretKey }).unless({
+  path: [/^\/api/] //定义不需要进行身份验证的请求前缀
+}));
+
 //用户路由模块
 const userRouter =  require('./router/user')
 app.use('/api', userRouter)

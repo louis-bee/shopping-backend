@@ -31,6 +31,7 @@ exports.login = (req, res)=>{
     //登录成功 生产Token
     const user = {...result[0], pwd:''}
     const tokenStr = jwt.sign(user, config.jwtSecretKey, {expiresIn:config.expiresIn})
+    const refreshTokenStr = jwt.sign(user, config.jwtSecretKey, {expiresIn:config.longExpiresIn})
     res.send({
       status: 200,
       desc: '登录成功',
@@ -39,7 +40,8 @@ exports.login = (req, res)=>{
         account: result[0].account,
         userName: result[0].userName,
         balance: result[0].balance,
-        token: 'Bearer '+ tokenStr
+        token: 'Bearer '+ tokenStr,
+        refreshToken: 'Bearer ' + refreshTokenStr,
       }
     })
   })
@@ -75,7 +77,7 @@ exports.logout = (req, res)=>{
   if(userId) {
     return res.cc('字段不能为空')
   }
-  //登录日志
+  //登录日志操作
   // const sqlout = `select * from user where account=?`
   // db.query(sqlsearch, userId, (err, result)=>{
   //   if(err) return res.cc(err)
@@ -85,4 +87,36 @@ exports.logout = (req, res)=>{
       desc: '登出成功',
     })
   // })
+}
+
+//刷新token
+exports.refreshToken = (req, res)=>{
+  const refreshToken = req.body.refreshToken
+  const userId = req.body.userId
+  //1.验证长token是否过期
+  try {
+    const decoded = jwt.verify(refreshToken.split(' ')[1], config.jwtSecretKey);
+    //2.生产Token
+    const sqlsearch = `select * from user where id=?`
+    db.query(sqlsearch, userId, (err, result)=>{
+      if(err) return res.cc(err)
+      if(result.length!==1) return res.cc('没有该账号')
+      const user = {...result[0], pwd:''}
+      const tokenStr = jwt.sign(user, config.jwtSecretKey, {expiresIn:config.expiresIn})
+      const refreshTokenStr = jwt.sign(user, config.jwtSecretKey, {expiresIn:config.longExpiresIn})
+      res.send({
+        status:200,
+        desc:'token刷新成功',
+        data: {
+          token: 'Bearer '+ tokenStr,
+          refreshToken: 'Bearer ' + refreshTokenStr,
+        }
+      })
+      //登录日志跟新
+    })
+    // console.log("Token is valid:", decoded);
+  } catch (error) {
+    // console.log(error.name);
+    return res.cc('登录已过期', 402);
+  }
 }

@@ -3,11 +3,12 @@ const db = require('../../db/index')
 //获取商品列表
 exports.getGoodsList = (req, res)=>{
   const sellerId = req.body.sellerId
+  const userId = req.body.userId
+  const type = req.body.type
   const pageSize = req.body.pageSize || 10
   const pageNum = req.body.pageNum || 1
   const offset = (pageNum-1)*pageSize
-  if (sellerId) {
-    // 售卖后台查询
+  if (sellerId) {  // 售卖后台查询
     // 查询符合条件的记录总数
     const sqlCount = 'select count(*) as total from goods where sellerId=? and status!=3';
     db.query(sqlCount, sellerId, (err, countResult) => {
@@ -40,10 +41,73 @@ exports.getGoodsList = (req, res)=>{
         });
       });
     });
-  } else {
-    res.cc('sellerId is required');
+  } else if(userId) {  //用户端查询
+    if(type) {   //有分类
+      const sqlCount = 'select count(*) as total from goods where type=? status=2';
+      db.query(sqlCount, type, (err, countResult) => {
+        if (err) {
+          return res.cc(err);
+        }
+        const total = countResult[0].total; // 获取总数
+        // 查询分页数据
+        const sqlsearch = 'select * from goods where type=? and status=2 limit ? offset ?'
+        db.query(sqlsearch, [type, pageSize, offset], (err, result) => {
+          if (err) {
+            return res.cc(err);
+          }
+          const list = result.map(item=>{
+            return {
+              ...item,
+              images: item.images.split('*')
+            }
+          })
+          // 返回结果，包含分页数据和总记录数
+          res.send({
+            status: 200,
+            desc: '查询成功',
+            data: {
+              list: list, // 分页数据
+              total: total, // 总记录数
+              pageSize: pageSize,
+              pageNum: pageNum,
+            },
+          });
+        });
+      });
+    } else { //无分类
+      const sqlCount = 'select count(*) as total from goods where status=2';
+      db.query(sqlCount, sellerId, (err, countResult) => {
+        if (err) {
+          return res.cc(err);
+        }
+        const total = countResult[0].total; // 获取总数
+        // 查询分页数据
+        const sqlsearch = 'select * from goods where status=2 limit ? offset ?'
+        db.query(sqlsearch, [pageSize, offset], (err, result) => {
+          if (err) {
+            return res.cc(err);
+          }
+          const list = result.map(item=>{
+            return {
+              ...item,
+              images: item.images.split('*')
+            }
+          })
+          // 返回结果，包含分页数据和总记录数
+          res.send({
+            status: 200,
+            desc: '查询成功',
+            data: {
+              list: list, // 分页数据
+              total: total, // 总记录数
+              pageSize: pageSize,
+              pageNum: pageNum,
+            },
+          });
+        });
+      });
+    }
   }
-  
 }
 //获取商品详情
 exports.getGoodsById = (req,res)=>{

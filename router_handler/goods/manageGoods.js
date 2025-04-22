@@ -72,5 +72,4 @@ exports.delGoods = (req, res) => {
       })
     }
   });
-  // 检查是否有关联的图书
 };
