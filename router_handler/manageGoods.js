@@ -1,4 +1,4 @@
-const db = require('../../db/index')
+const db = require('../db/index')
 
 //创建商品
 exports.addGoods = (req,res)=>{

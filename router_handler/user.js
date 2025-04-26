@@ -5,6 +5,13 @@ const config = require('../config')
 
 //登录
 exports.login = (req, res)=>{
+  // console.log(req.headers['x-forwarded-for']) //undefined
+  // console.log(req.ip)   //::1
+  // console.log(req.connection.remoteAddress) //::1
+  // console.log(req.socket.remoteAddress) //::1
+  // console.log(req.headers.referer);
+  // console.log(req.headers.origin);
+  
   const userInfo = req.body
   if(!userInfo.account||!userInfo.pwd) {
     return res.cc('账号密码不能为空')
@@ -20,11 +27,11 @@ exports.login = (req, res)=>{
     if(!compareResult) return res.cc('登录失败')
     //角色与登录网站不一致
     if(result[0].role!==userInfo.role){
-      if(userInfo.role===1) {
+      if(result[0].role===1) {
         return res.cc('请前往用户端登录', 304)
-      } else if(userInfo.role===2) {
+      } else if(result[0].role===2) {
         return res.cc('请前往销售后台端登录', 304)
-      } else if(userInfo.role===3) {
+      } else if(result[0].role===3) {
         return res.cc('请前往后台管理端登录', 304)
       }
     }

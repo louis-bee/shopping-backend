@@ -1,7 +1,8 @@
-const db = require('../../db/index')
+const db = require('../db/index')
 
 //获取商品列表
 exports.getGoodsList = (req, res)=>{
+  const role = req.body.role
   const sellerId = req.body.sellerId
   const userId = req.body.userId
   const type = req.body.type
@@ -41,9 +42,9 @@ exports.getGoodsList = (req, res)=>{
         });
       });
     });
-  } else if(userId) {  //用户端查询
+  } else if(role===1) {  //用户端查询
     if(type) {   //有分类
-      const sqlCount = 'select count(*) as total from goods where type=? status=2';
+      const sqlCount = 'select count(*) as total from goods where type=? and status=2';
       db.query(sqlCount, type, (err, countResult) => {
         if (err) {
           return res.cc(err);
@@ -76,7 +77,7 @@ exports.getGoodsList = (req, res)=>{
       });
     } else { //无分类
       const sqlCount = 'select count(*) as total from goods where status=2';
-      db.query(sqlCount, sellerId, (err, countResult) => {
+      db.query(sqlCount, (err, countResult) => {
         if (err) {
           return res.cc(err);
         }
