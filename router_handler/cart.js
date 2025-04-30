@@ -16,21 +16,24 @@ exports.getCartList = (req, res)=>{
     // 获取购物车中所有商品的 goodsId
     const goodsIds = result.map(item => item.goodsId);
     // 查询 goods 表，获取对应商品的 image 和 price
-    const sqlGetGoods = 'select id, images, price, goodsName from goods where id in (?)';
+    const sqlGetGoods = 'select id, images, price, goodsName, status from goods where id in (?)';
     db.query(sqlGetGoods, [goodsIds], (err, goodsResult) => {
       if (err) return res.cc(err);
       // 将 goodsResult 转换为一个对象，方便后续通过 goodsId 快速查找
       const goodsMap = goodsResult.reduce((acc, item) => {
-        acc[item.id] = { images: item.images, price: item.price, goodsName: item.goodsName };
+        acc[item.id] = { images: item.images, price: item.price, goodsName: item.goodsName, status: item.status };
         return acc;
       }, {});
+
+      //待优化： 需要处理下架的商品
 
       // 将商品信息添加到购物车列表中
       const cartList = result.map(item => {
         return {
           ...item,
+          ...goodsMap[item.goodsId],
           images: goodsMap[item.goodsId]?.images.split('*'),
-          price: goodsMap[item.goodsId]?.price
+          // price: goodsMap[item.goodsId]?.price
         };
       });
 
@@ -133,6 +136,26 @@ exports.deleteCart = (req,res) =>{
       res.send({
         status: 200,
         desc: '已从购物车删除'
+      })
+    }
+  })
+}
+
+//购物车数量
+exports.getCartNum = (req,res) =>{
+  const { userId } = req.body
+  const sql = 'select count(*) as cartNum from orders where consumerId = ? and status = 1';
+  db.query(sql, userId, (err, result) => {
+    if (err) {
+      res.cc(err);
+    } else {
+      const cartNum = result[0].cartNum
+      res.send({
+        status: 200,
+        desc: '查询成功',
+        data: {
+          cartNum: cartNum
+        }
       })
     }
   })

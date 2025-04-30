@@ -1,4 +1,5 @@
 const db = require('../db/index')
+const { codeStore } = require('../utils/store.js')
 
 //获取商品列表
 exports.getGoodsList = (req, res)=>{
@@ -71,6 +72,7 @@ exports.getGoodsList = (req, res)=>{
               total: total, // 总记录数
               pageSize: pageSize,
               pageNum: pageNum,
+              codeStore
             },
           });
         });

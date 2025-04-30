@@ -10,4 +10,6 @@ router.post('/updateCart', cartHandler.updateCart)
 
 router.post('/deleteCart', cartHandler.deleteCart)
 
+router.post('/getCartNum', cartHandler.getCartNum)
+
 module.exports = router

@@ -60,10 +60,21 @@ app.use('/manageGoods', manageGoodsRouter)
 const cartRouter =  require('./router/cart')
 app.use('/cart', cartRouter)
 
+//购物车路由模块
+const orderRouter =  require('./router/order')
+app.use('/order', orderRouter)
+
+//支付路由模块
+const payRouter =  require('./router/pay')
+app.use('/pay', payRouter)
+
 //图片上传路由模块
 const uploadRouter =  require('./router/upload')
 app.use('/upload', uploadRouter)
 
+//邮箱模块路由模块
+const emailRouter =  require('./router/email')
+app.use('/email', emailRouter)
 
 //使用全局错误处理中间件
 app.use((err, req, res, next) => {
