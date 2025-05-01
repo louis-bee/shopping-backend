@@ -1,4 +1,5 @@
 const db = require('../db/index')
+const moment = require('moment')
 
 //查询订单（用户端）
 exports.getOrderList = (req, res)=>{
@@ -7,7 +8,7 @@ exports.getOrderList = (req, res)=>{
   const pageSize = req.body.pageSize
   const startIndex = (pageNum-1)*pageSize
 
-  const sqlsearch = `select * from orders where status!=1 and consumerId=?`
+  const sqlsearch = `select * from orders where status!=1 and consumerId=? order by id desc`
   db.query(sqlsearch, userId, (err,result)=>{
     if(err) return res.cc(err)
     if(result.length===0) {
@@ -40,6 +41,7 @@ exports.getOrderList = (req, res)=>{
           images: goodsMap[item.goodsId]?.images.split('*'),
           price: goodsMap[item.goodsId]?.price,
           goodsName: goodsMap[item.goodsId]?.goodsName,
+          time: moment(item.time).format('YYYY-MM-DD')
         };
       });
 
@@ -63,13 +65,13 @@ exports.getOrderListBySeller = (req, res)=>{
   let sqlSearch = ''
   //根据商品id/用户id/商家id
   if(type==='goods') {
-    sqlSearch = `select * from orders where status!=1 and goodsId = ?`
+    sqlSearch = `select * from orders where status!=1 and goodsId = ? order by id desc`
   } else if(type==='seller') {
-    sqlSearch = `select * from orders where status!=1 and sellerId = ?`
+    sqlSearch = `select * from orders where status!=1 and sellerId = ? order by id desc`
   } else if(type==='consumer') {
-    sqlSearch = `select * from orders where status!=1 and consumerId = ?`
+    sqlSearch = `select * from orders where status!=1 and consumerId = ? order by id desc`
   } else {
-    sqlSearch = `select * from orders where status!=1`
+    sqlSearch = `select * from orders where status!=1 order by id desc`
   }
   db.query(sqlSearch, sqlQuery, (err,result)=>{
     if(err) return res.cc(err)
@@ -114,7 +116,8 @@ exports.getOrderListBySeller = (req, res)=>{
           images: goodsMap[item.goodsId]?.images.split('*'),
           price: goodsMap[item.goodsId]?.price,
           goodsName: goodsMap[item.goodsId]?.goodsName,
-          userName: userMap[item.consumerId]?.userName
+          userName: userMap[item.consumerId]?.userName,
+          time: moment(item.time).format('YYYY-MM-DD')
         };
       });
 

@@ -76,9 +76,13 @@ app.use('/admin', adminRouter)
 const uploadRouter =  require('./router/upload')
 app.use('/upload', uploadRouter)
 
-//数据中学路由模块
+//数据中心路由模块
 const dataRouter = require('./router/data')
 app.use('/data', dataRouter)
+
+//日志路由模块
+const logRouter = require('./router/log')
+app.use('/log', logRouter)
 
 //使用全局错误处理中间件
 app.use((err, req, res, next) => {

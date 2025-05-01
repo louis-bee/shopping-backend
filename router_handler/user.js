@@ -38,7 +38,7 @@ exports.login = (req, res)=>{
     const refreshTokenStr = jwt.sign(user, config.jwtSecretKey, {expiresIn:config.longExpiresIn})
 
     try {
-      const ip = req.headers['x-forwarded-for'] || req.ip;
+      const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
       loginLoger.login(ip, result[0].id, userInfo.role)
     } catch {
 
@@ -105,7 +105,7 @@ exports.logout = (req, res)=>{
   }
   //日志操作
   try {
-    const ip = req.headers['x-forwarded-for'] || req.ip;
+    const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
     loginLoger.logout(userId, ip)
   } catch {
 
@@ -122,7 +122,7 @@ exports.refreshToken = (req, res)=>{
   const userId = req.body.userId
   //1.验证长token是否过期
   try {
-    const decoded = jwt.verify(refreshToken.split(' ')[1], config.jwtSecretKey);
+    jwt.verify(refreshToken.split(' ')[1], config.jwtSecretKey);
     //2.生产Token
     const sqlsearch = `select * from user where id=?`
     db.query(sqlsearch, userId, (err, result)=>{
@@ -134,7 +134,7 @@ exports.refreshToken = (req, res)=>{
 
       //登录日志跟新
       try {
-        const ip = req.headers['x-forwarded-for'] || req.ip;
+        const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
         loginLoger.refresh(userId, ip)
       } catch {
     
