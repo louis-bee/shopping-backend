@@ -10,4 +10,6 @@ router.post('/logout', userHandler.logout)
 
 router.post('/refreshToken', userHandler.refreshToken)
 
+router.post('/sendAdminCode', userHandler.sendAdminCode)
+
 module.exports = router

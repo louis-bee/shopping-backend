@@ -68,13 +68,17 @@ app.use('/order', orderRouter)
 const payRouter =  require('./router/pay')
 app.use('/pay', payRouter)
 
+//支付路由模块
+const adminRouter =  require('./router/admin')
+app.use('/admin', adminRouter)
+
 //图片上传路由模块
 const uploadRouter =  require('./router/upload')
 app.use('/upload', uploadRouter)
 
-//邮箱模块路由模块
-const emailRouter =  require('./router/email')
-app.use('/email', emailRouter)
+//数据中学路由模块
+const dataRouter = require('./router/data')
+app.use('/data', dataRouter)
 
 //使用全局错误处理中间件
 app.use((err, req, res, next) => {

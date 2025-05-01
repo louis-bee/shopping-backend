@@ -27,6 +27,7 @@ exports.addGoods = (req,res)=>{
 //修改商品
 exports.updateGoods = (req,res)=>{
   const goodsInfo = req.body
+  
   if(!goodsInfo.sellerId||!goodsInfo.goodsName||!goodsInfo.type||!goodsInfo.desc||!goodsInfo.price||!goodsInfo.status||goodsInfo.amount===undefined||goodsInfo.view===undefined||goodsInfo.sales===undefined||!goodsInfo.images) {
     return res.cc('字段不能为空')
   }

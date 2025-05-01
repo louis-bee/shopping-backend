@@ -42,6 +42,37 @@ function sendMail(mail, code, call) {
 
 }
 
+function sendAdminMail(account, userName, code, call) {
+	// 发送的配置项
+	let mailOptions = {
+		from: '"路易斯商城" <2720447678@qq.com>', // 发送方
+		to: '2720447678@qq.com', //接收者邮箱，多个邮箱用逗号间隔
+		subject: '管理员账号申请', // 标题
+		// text: '', // 文本内容
+		html: `<div>${userName}（账号${account}）申请管理员账号,下面是注册许可秘钥：<h3>${code}</h3><p>有效期1h</p></div>`, //页面内容
+		// attachments: [{//发送文件
+		// 		filename: 'index.html', //文件名字
+		// 		path: './index.html' //文件路径
+		// 	},
+		// 	{
+		// 		filename: 'sendEmail.js', //文件名字
+		// 		content: 'sendEmail.js' //文件路径
+		// 	}
+		// ]
+	};
+
+	//发送函数
+	transporter.sendMail(mailOptions, (error, info) => {
+		if (error) {
+			call(false)
+		} else {
+			call(true) //因为是异步 所有需要回调函数通知成功结果
+		}
+	});
+
+}
+
 module.exports = {
-	sendMail
+	sendMail,
+	sendAdminMail
 }

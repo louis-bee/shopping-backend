@@ -1,5 +1,8 @@
 const codeStore = {};
 
+const adminCodeStore = {};
+
 module.exports = {
-  codeStore
+  codeStore,
+  adminCodeStore
 };
