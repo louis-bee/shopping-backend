@@ -112,3 +112,88 @@ exports.getHotGoodsBySeller = (req, res) => {
     });
   });
 };
+
+
+exports.getMonthLoginByAdmin = (req, res) => {
+  const { adminId } = req.body;
+
+  // 获取当前时间的30天前的时间戳
+  const thirtyDaysAgo = moment().subtract(30, 'days').format('YYYY-MM-DD');
+
+  // 删除30天前的登录数据
+  const sqlDelete = `DELETE FROM logindata WHERE loginTime < '${thirtyDaysAgo}'`;
+
+  db.query(sqlDelete, (deleteErr) => {
+    if (deleteErr) {
+      return res.cc(deleteErr);
+    }
+
+    // 查询近15天的登录数据
+    const sqlLogin = `SELECT * FROM logindata WHERE loginTime >= '${thirtyDaysAgo}'`;
+
+    db.query(sqlLogin, (err, loginResult) => {
+      if (err) return res.cc(err);
+      if (loginResult.length < 1) return res.cc('暂无数据');
+
+      // 统计每天的登录数量
+      const orderCount = {};
+      loginResult.forEach(item => {
+        const date = moment(item.loginTime).utc().format('YYYY-MM-DD'); // 转换为 UTC 时间并格式化
+        if (!orderCount[date]) {
+          orderCount[date] = 0;
+        }
+        orderCount[date] += 1;
+      });
+
+      // 获取近15天的日期范围
+      const dates = [];
+      for (let i = 0; i < 15; i++) {
+        const date = moment().subtract(i, 'days').format('YYYY-MM-DD');
+        dates.push(date);
+      }
+
+      const stats = dates.map(date => ({
+        date: date,
+        count: orderCount[date] || 0
+      }));
+
+      res.send({
+        status: 200,
+        desc: '查询成功',
+        data: {
+          monthLogin: {
+            dates: stats.map(item => item.date).reverse(),
+            counts: stats.map(item => item.count).reverse()
+          }
+        }
+      });
+    });
+  });
+};
+
+//获取销量最高的5个xsller
+exports.getTopSeller = (req, res) => {
+  const { adminId } = req.body;
+
+  // 查询top5
+  const sqlOrder = 'SELECT sellerId, SUM(number) AS totalSales FROM orders WHERE status!=1 GROUP BY sellerId ORDER BY totalSales DESC LIMIT 5';
+  db.query(sqlOrder, (err, result) => {
+    if (err) return res.cc(err);
+
+    // 提取商品ID和销量
+    const sellers = result.map(item => item.sellerId);
+    const counts = result.map(item => item.totalSales);
+
+    res.send({
+      status:200,
+      desc:'查询成功',
+      data: {
+        topSeller: {
+          sellers: sellers,
+          counts: counts
+        }
+      }
+    })
+
+  });
+};

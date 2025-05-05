@@ -84,6 +84,16 @@ app.use('/data', dataRouter)
 const logRouter = require('./router/log')
 app.use('/log', logRouter)
 
+// app.router.all('/',(req,res)=>[
+//   res.send({
+//     status:200,
+//     desc:'测试',
+//     data: {
+//       id: req.ip
+//     }
+//   })
+// ])
+
 //使用全局错误处理中间件
 app.use((err, req, res, next) => {
   // 这次错误是由 token 解析失败导致的
