@@ -40,9 +40,7 @@ exports.login = (req, res)=>{
     try {
       const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
       loginLoger.login(ip, result[0].id, userInfo.role)
-    } catch {
-
-    }
+    } catch {}
 
     res.send({
       status: 200,

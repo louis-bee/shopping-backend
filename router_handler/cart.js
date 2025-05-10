@@ -1,8 +1,16 @@
 const db = require('../db/index')
+const actionLoger = require('../utils/actionLoger.js')
 
 //查询购物车
 exports.getCartList = (req, res)=>{
   const userId = req.body.userId
+
+  //日志
+  try {
+    const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+    actionLoger.log(ip, `查询购物车列表`, 1, 1, userId)
+  } catch {}
+
   const sqlsearch = 'select * from orders where status=1 and consumerId=?'
   db.query(sqlsearch, userId, (err,result)=>{
     if(err) return res.cc(err)
@@ -78,6 +86,11 @@ exports.addToCart = (req,res)=> {
         db.query(sqlAdd,orderInfo, (err,addResult)=>{
           if(err) return res.cc(err)
           if(addResult.affectedRows!==1) return res.cc('添加失败')
+          //日志
+          try {
+            const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+            actionLoger.log(ip, `添加${number}个商品${goodsId}到购物车`, 2, 1, userId)
+          } catch {}
           return res.send({
             status: 200,
             desc: '添加成功',
@@ -93,6 +106,11 @@ exports.addToCart = (req,res)=> {
         db.query(sqlUpdate, [newNumber, orderId] ,(err, updateResult)=>{
           if(err) return res.cc(err)
           if(updateResult.affectedRows!==1) return res.cc('添加失败')
+          //日志
+          try {
+            const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+            actionLoger.log(ip, `修改购物车商品数量为${number},订单id:${orderId}`, 3, 1, userId)
+          } catch {}
           return res.send({
             status: 200,
             desc: '添加成功',
@@ -111,11 +129,19 @@ exports.addToCart = (req,res)=> {
 exports.updateCart = (req,res)=> {
   const { userId, orderId, number } = req.body
   //待优化： 添加用户id的校验
+
+
+
   const sqlUpdate = 'UPDATE orders SET number = ? WHERE id = ?';
   db.query(sqlUpdate, [number, orderId], (err, result) => {
     if (err) {
       res.cc(err);
     } else {
+      //日志
+      try {
+        const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+        actionLoger.log(ip, `修改购物车商品数量为${number},订单id:${orderId}`, 3, 1, userId)
+      } catch {}
       res.send({
         status: 200,
         desc: '更新数量成功'
@@ -133,6 +159,11 @@ exports.deleteCart = (req,res) =>{
     if (err) {
       res.cc(err);
     } else {
+      //日志
+      try {
+        const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+        actionLoger.log(ip, `移出购物车,订单id:${orderId}`, 3, 1, userId)
+      } catch {}
       res.send({
         status: 200,
         desc: '已从购物车删除'
@@ -150,6 +181,11 @@ exports.getCartNum = (req,res) =>{
       res.cc(err);
     } else {
       const cartNum = result[0].cartNum
+      //日志
+      try {
+        const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+        actionLoger.log(ip, `获取购物车数量`, 1, 1, userId)
+      } catch {}
       res.send({
         status: 200,
         desc: '查询成功',

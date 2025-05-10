@@ -1,5 +1,6 @@
 const db = require('../db/index')
 const { codeStore } = require('../utils/store.js')
+const actionLoger = require('../utils/actionLoger.js')
 
 //获取商品列表
 exports.getGoodsList = (req, res)=>{
@@ -23,6 +24,11 @@ exports.getGoodsList = (req, res)=>{
           images: item.images.split('*')
         }
       })
+      //日志
+      try {
+        const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+        actionLoger.log(ip, `查询销售人员${sellerId}的商品列表`, 1, role, userId)
+      } catch {}
       // 返回结果，包含分页数据和总记录数
       res.send({
         status: 200,
@@ -55,6 +61,11 @@ exports.getGoodsList = (req, res)=>{
               images: item.images.split('*')
             }
           })
+          //日志
+          try {
+            const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+            actionLoger.log(ip, `查询${type}类别商品列表`, 1, role, userId)
+          } catch {}
           // 返回结果，包含分页数据和总记录数
           res.send({
             status: 200,
@@ -89,6 +100,11 @@ exports.getGoodsList = (req, res)=>{
               images: item.images.split('*')
             }
           })
+          //日志
+          try {
+            const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+            actionLoger.log(ip, `查询商品列表`, 1, role, userId)
+          } catch {}
           // 返回结果，包含分页数据和总记录数
           res.send({
             status: 200,
@@ -116,6 +132,11 @@ exports.getGoodsList = (req, res)=>{
             images: item.images.split('*')
           }
         })
+        //日志
+        try {
+          const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+          actionLoger.log(ip, `查询${type}类别商品列表`, 1, role, userId)
+        } catch {}
         // 返回结果，包含分页数据和总记录数
         res.send({
           status: 200,
@@ -140,6 +161,11 @@ exports.getGoodsList = (req, res)=>{
             images: item.images.split('*')
           }
         })
+        //日志
+        try {
+          const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+          actionLoger.log(ip, `查询商品列表`, 1, role, userId)
+        } catch {}
         // 返回结果，包含分页数据和总记录数
         res.send({
           status: 200,
@@ -174,6 +200,11 @@ exports.getGoodsById = (req,res)=>{
     }
     //图片地址列表 字符串转数组
     const imagesList = result[0].images.split('*')
+    //日志
+    try {
+      const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+      actionLoger.log(ip, `获取商品${goodsId}详情`, 1, -1, -1)
+    } catch {}
     res.send({
       status: 200,
       desc: '查询成功',

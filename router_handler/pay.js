@@ -1,6 +1,7 @@
 const db = require('../db/index')
 const { codeStore } = require('../utils/store.js')
 const emailCtrl = require('../utils/email.js'); 
+const actionLoger = require('../utils/actionLoger.js')
 
 //查询余额
 exports.getBalance = (req, res)=>{
@@ -11,6 +12,11 @@ exports.getBalance = (req, res)=>{
     if(result.length===0) {
       return res.cc("没有该用户")
     }
+    //日志
+    try {
+      const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+      actionLoger.log(ip, `查询余额`, 1, 1, userId)
+    } catch {}
     res.send({
       status: 200,
       desc: '查询成功',
@@ -69,6 +75,11 @@ exports.payBill = (req, res)=>{
       
         // 使用 Promise.all 等待所有更新完成
         Promise.all(updatePromises).then(() => {
+          //日志
+          try {
+            const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+            actionLoger.log(ip, `支付订单`, 1, 3, userId)
+          } catch {}
           res.send({
             status: 200,
             desc: '支付成功',
@@ -115,7 +126,11 @@ exports.sendCode = (req, res)=>{
 	emailCtrl.sendMail(email, code, (state) => {
 		if (state) {
       codeStore[email] = { code, time: now, userId }
-      
+      //日志
+      try {
+        const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+        actionLoger.log(ip, `发送支付验证码`, 1, 1, userId)
+      } catch {}
 			return res.send({
         status: 200,
         desc: '验证码已发送',
@@ -136,6 +151,11 @@ exports.recharge = (req, res)=>{
     const sqlEditBalance = 'update user set balance = ? where id = ?'
     db.query(sqlEditBalance, [newBalance, userId], (err, editResult)=>{
       if(err) return res.cc(err)
+      //日志
+      try {
+        const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+        actionLoger.log(ip, `充值${money}元`, 3, 1, userId)
+      } catch {}
       res.send({
         status:200,
         desc: '充值成功',

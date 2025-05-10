@@ -6,4 +6,8 @@ router.post('/getLoginLogList', logHandler.getLoginLogList)
 
 router.post('/delLoginLog', logHandler.delLoginLog)
 
+router.post('/getActionLogList', logHandler.getActionLogList)
+
+router.post('/delActionLog', logHandler.delActionLog)
+
 module.exports = router

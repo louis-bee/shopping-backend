@@ -1,5 +1,6 @@
 const db = require('../db/index')
 const moment = require('moment')
+const actionLoger = require('../utils/actionLoger.js')
 
 //查询订单（用户端）
 exports.getOrderList = (req, res)=>{
@@ -7,6 +8,12 @@ exports.getOrderList = (req, res)=>{
   const pageNum = req.body.pageNum
   const pageSize = req.body.pageSize
   const startIndex = (pageNum-1)*pageSize
+
+  //日志
+  try {
+    const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+    actionLoger.log(ip, `获取订单列表`, 1, 1, userId)
+  } catch {}
 
   const sqlsearch = `select * from orders where status!=1 and consumerId=? order by id desc`
   db.query(sqlsearch, userId, (err,result)=>{
@@ -61,8 +68,17 @@ exports.getOrderList = (req, res)=>{
 //查询订单（销售端） （前端做分页）
 exports.getOrderListBySeller = (req, res)=>{
   const type = req.body.type
+  const role = req.body.role
+  const userId = req.body.userId
   const sqlQuery = req.body.search
   let sqlSearch = ''
+
+  //日志
+  try {
+    const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+    actionLoger.log(ip, `获取订单列表`, 1, role, userId)
+  } catch {}
+
   //根据商品id/用户id/商家id
   if(type==='goods') {
     sqlSearch = `select * from orders where status!=1 and goodsId = ? order by id desc`
@@ -139,13 +155,18 @@ exports.getOrderListBySeller = (req, res)=>{
 
 //发货
 exports.delivery = (req, res)=>{
-  const {sellerId, orderId} = req.body
+  const {userId, orderId, role} = req.body
   //待优化: 校验销售人员
 
   const sqlsearch = `update orders set status = 3 where id = ?`
   db.query(sqlsearch, orderId, (err,result)=>{
     if(err) return res.cc(err)
     else {
+      //日志
+      try {
+        const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+        actionLoger.log(ip, `订单${orderId}发货`, 3, role, userId)
+      } catch {}
       res.cc("发货成功",200)
     }
   })

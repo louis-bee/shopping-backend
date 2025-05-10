@@ -1,5 +1,6 @@
 const db = require('../db/index.js')
 const moment = require('moment')
+const actionLoger = require('../utils/actionLoger.js')
 
 //获取近15天销量
 exports.getMonthTotalBySeller = (req, res)=>{
@@ -30,6 +31,12 @@ exports.getMonthTotalBySeller = (req, res)=>{
         date: date,
         count: orderCount[date] || 0
       })); 
+
+      //日志
+      try {
+        const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+        actionLoger.log(ip, `拉取近15天销售数据`, 1, 2, sellerId)
+      } catch {}
 
     res.send({
       status: 200,
@@ -100,7 +107,11 @@ exports.getHotGoodsBySeller = (req, res) => {
         goods: goodsIds.map(id => goodsMap[id]),
         sales: sales
       };
-
+      //日志
+      try {
+        const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+        actionLoger.log(ip, `获取销售商品榜单`, 1, 2, sellerId)
+      } catch {}
       // 返回结果
       res.send({
         status: 200,
@@ -156,7 +167,11 @@ exports.getMonthLoginByAdmin = (req, res) => {
         date: date,
         count: orderCount[date] || 0
       }));
-
+      //日志
+      try {
+        const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+        actionLoger.log(ip, `获取近15天用户量数据`, 1, 3, adminId)
+      } catch {}
       res.send({
         status: 200,
         desc: '查询成功',
@@ -183,7 +198,11 @@ exports.getTopSeller = (req, res) => {
     // 提取商品ID和销量
     const sellers = result.map(item => item.sellerId);
     const counts = result.map(item => item.totalSales);
-
+    //日志
+    try {
+      const ip = req.headers['x-forwarded-for'] || req.ip || 'unknown';
+      actionLoger.log(ip, `获取销售业绩榜单`, 1, 3, adminId)
+    } catch {}
     res.send({
       status:200,
       desc:'查询成功',
