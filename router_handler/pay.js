@@ -125,3 +125,24 @@ exports.sendCode = (req, res)=>{
 		}
 	})
 }
+
+
+exports.recharge = (req, res)=>{
+  const { userId, money } = req.body
+  const sqlSelect = 'select balance from user where id = ?'
+  db.query(sqlSelect, userId, (err,selResult)=>{
+    if(err) return res.cc(err)
+    const newBalance = selResult[0].balance + money
+    const sqlEditBalance = 'update user set balance = ? where id = ?'
+    db.query(sqlEditBalance, [newBalance, userId], (err, editResult)=>{
+      if(err) return res.cc(err)
+      res.send({
+        status:200,
+        desc: '充值成功',
+        data:{
+          balance: newBalance
+        }
+      })
+    })
+  })
+}

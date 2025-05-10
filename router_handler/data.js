@@ -129,7 +129,7 @@ exports.getMonthLoginByAdmin = (req, res) => {
     }
 
     // 查询近15天的登录数据
-    const sqlLogin = `SELECT * FROM logindata WHERE loginTime >= '${thirtyDaysAgo}'`;
+    const sqlLogin = `SELECT * FROM logindata WHERE role=1 and loginTime >= '${thirtyDaysAgo}'`;
 
     db.query(sqlLogin, (err, loginResult) => {
       if (err) return res.cc(err);

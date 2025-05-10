@@ -6,6 +6,8 @@ router.post('/getBalance', payHandler.getBalance)
 
 router.post('/payBill', payHandler.payBill),
 
-router.post('/sendCode', payHandler.sendCode)
+router.post('/sendCode', payHandler.sendCode)  
+
+router.post('/recharge', payHandler.recharge)
 
 module.exports = router
