@@ -60,7 +60,7 @@ app.use('/manageGoods', manageGoodsRouter)
 const cartRouter =  require('./router/cart')
 app.use('/cart', cartRouter)
 
-//购物车路由模块
+//订单路由模块
 const orderRouter =  require('./router/order')
 app.use('/order', orderRouter)
 
