@@ -8,7 +8,7 @@ exports.getMonthTotalBySeller = (req, res)=>{
   const sqlOrder = 'select * from orders where sellerId = ? and status!=1'
   db.query(sqlOrder, sellerId, (err, orderResult)=>{
     if(err) res.cc(err)
-    if(orderResult.length<1) res.cc('暂无数据')
+    if(orderResult.length<1) return res.cc('暂无数据')
 
       // 统计每天的订单数量
       const orderCount = {};
@@ -51,33 +51,6 @@ exports.getMonthTotalBySeller = (req, res)=>{
   })
 }
 
-// exports.getHotGoodsBySeller = (req, res)=>{
-//   const { sellerId } = req.body
-//   const sqlOrder = 'select * from orders where sellerId = ?'
-//   db.query(sqlOrder, sellerId,(err,result )=>{
-//     if(err) return res.cc(err)
-
-//   })
-
-//   我现在需要返回这个销售人员销量最高的5个商品的商品名和销量
-//   返回的格式如下
-//   res.send({
-//     status:200,
-//     desc: '查询成功',
-//     data: {
-//       hotGoods: {
-//         goods: [],
-//         sales: []
-//       }
-//     }
-//   })
-
-//   数据库说明:
-//   orders表：包含(id订单号, sellerId销售人员, goodsId商品id, number数量)
-//   goods表：包含(id商品id, goodsName商品名称)
-
-// }
-
 //获取销量最高的5个
 exports.getHotGoodsBySeller = (req, res) => {
   const { sellerId } = req.body;
@@ -86,6 +59,16 @@ exports.getHotGoodsBySeller = (req, res) => {
   const sqlOrder = 'SELECT goodsId, SUM(number) AS totalSales FROM orders WHERE sellerId = ? and status!=1 GROUP BY goodsId ORDER BY totalSales DESC LIMIT 5';
   db.query(sqlOrder, sellerId, (err, result) => {
     if (err) return res.cc(err);
+    if(result.length===0) return res.send({
+      status:200,
+      desc:'暂无数据',
+      data: {
+        hotGoods: {
+          goods:[],
+          sales:[]
+        }
+      }
+    }) 
 
     // 提取商品ID和销量
     const goodsIds = result.map(item => item.goodsId);
@@ -194,7 +177,16 @@ exports.getTopSeller = (req, res) => {
   const sqlOrder = 'SELECT sellerId, SUM(number) AS totalSales FROM orders WHERE status!=1 GROUP BY sellerId ORDER BY totalSales DESC LIMIT 5';
   db.query(sqlOrder, (err, result) => {
     if (err) return res.cc(err);
-
+    if(result.length===0) return res.send({
+      status:200,
+      desc:'暂无数据',
+      data: {
+        topSeller: {
+          sellers: [],
+          counts: []
+        }
+      }
+    })
     // 提取商品ID和销量
     const sellers = result.map(item => item.sellerId);
     const counts = result.map(item => item.totalSales);

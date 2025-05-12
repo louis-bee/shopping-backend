@@ -3,8 +3,8 @@ const actionLoger = require('../utils/actionLoger.js')
 
 //创建商品
 exports.addGoods = (req,res)=>{
-  const goodsInfo = req.body
-  if(!goodsInfo.sellerId||!goodsInfo.goodsName||!goodsInfo.type||!goodsInfo.desc||!goodsInfo.price||!goodsInfo.status||!goodsInfo.amount||goodsInfo.view!==0||goodsInfo.sales!==0||!goodsInfo.images) {
+  const goodsInfo = req.body.goodsInfo
+  if(!goodsInfo.sellerId||!goodsInfo.goodsName||!goodsInfo.type||!goodsInfo.desc||!goodsInfo.price||!goodsInfo.status||!goodsInfo.amount||!goodsInfo.images) {
     return res.cc('字段不能为空')
   }
   const imagesList = goodsInfo.images.join('*')
